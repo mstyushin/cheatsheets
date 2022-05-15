@@ -15,3 +15,5 @@ A list of some terminal (and probably other) operations that I did more than onc
 
 -   [OpenSSL](<openssl/openssl.md>)
 
+-   [PostgreSQL](<postgresql/postgresql.md>)
+
