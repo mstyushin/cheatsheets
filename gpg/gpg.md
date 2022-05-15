@@ -1,0 +1,64 @@
+GPG cli examples
+================
+
+-   Generate a key:
+
+        $ gpg --gen-key
+
+-   Export a public key:
+
+        $ gpg --output ~/mygpg.key --armor --export your_email@address.com
+
+-   Generate a revocation cert:
+
+        $ gpg --output ~/revocation.crt --gen-revoke your_email@address.com
+
+-   Import someone else's public key:
+
+        $ gpg --import name_of_pub_key_file
+
+-   Search keys from a public server:
+
+        $ gpg --keyserver pgp.mit.edu  --search-keys search_parameters
+
+-   Get a fingerprint of a public key in a local keyring:
+
+        $ gpg --fingerprint your_email@address.com
+
+-   Sign a key which you trust:
+
+        $ gpg --sign-key email@example.com
+
+-   Encrypt a file for a specified recipient:
+
+        $ gpg --encrypt --sign --armor -r person@email.com name_of_file
+
+-   Decrypt a file:
+
+        $ gpg file_name.asc
+
+-   Decrypt **myfile_encrypted** and store decrypted content in **myfile_decrypted** file:
+
+        $ gpg --output myfile_encrypted --decrypt myfile_decrypted
+
+-   Encrypt **myfile** using a passphrase:
+
+        $ gpg --armour --symmetric myfile
+
+-   Export keypair from a local keyring:
+
+        $ gpg --export <key_hash> > /tmp/public.key
+        $ gpg --export-secret-key <key_hash> > /tmp/private.key
+
+-   Get somebody's public key from a public keyserver using keyID:
+
+        $ gpg --keyserver pgp.mit.edu --recv 0xfe3348877809386c
+
+-   Check public key signatures:
+
+        $ gpg --check-sigs A490D0F4D311A4153E2BB7CADBB802B258ACD84F
+
+-   Verify Tails image:
+
+        $ gpg --no-options --keyid-format 0xlong --verify tails-amd64-3.6.2.iso.sig tails-amd64-3.6.2.iso
+

@@ -9,5 +9,7 @@ A list of some terminal (and probably other) operations that I did more than onc
 
 -   [Git](<git/git.md>)
 
+-   [GPG](<gpg/gpg.md>)
+
 -   [MySQL](<mysql/mysql.md>)
 
