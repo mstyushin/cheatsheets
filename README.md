@@ -13,3 +13,5 @@ A list of some terminal (and probably other) operations that I did more than onc
 
 -   [MySQL](<mysql/mysql.md>)
 
+-   [OpenSSL](<openssl/openssl.md>)
+
