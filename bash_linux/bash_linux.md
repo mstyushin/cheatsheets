@@ -1,93 +1,80 @@
 Bash&Linux
 ==========
 
-Mostly linux-specific bash tricks.
+Mostly linux-specific stuff.
 
-### Sections
+## Sections
 
--   [AWK](#AWK-magic)
+-   [Text processing](#Text-processing)
 
--   [MySQL](#MySQL-queries-and-operations)
+-   [GDB magic](#GDB-magic)
 
--   [netstat](#netstat)
+-   [Misc](#Misc)
 
--   [openssl](#openssl)
-
--   [uncategorized](#uncategorized)
-
-### Content
-
-#### AWK magic
+### Text processing
 
 -   Print field 3 if it starts from **some_string**:
 
         $ awk '$3 ~ /^ *some_string/ {print $3}'
 
-#### MySQL queries and operations
+-   Get unique IPs connected to local port 2222:
 
--   Create new user:
+        $ netstat -nap | grep 2222 | awk '{print $5}' | cut -d: -f1 | sort -u
 
-        # create user 'username'@'hostname' identified with 'password’;
+-   Get a value of the **status** key in a json:
 
--   Create new DB:
+        $ echo '{"jobId":"1","status":"RUNNING"}'|python3 -c 'import sys, json; print(json.load(sys.stdin)[sys.argv[1]])' status
 
-        # create database test;
+-   Get top5 CPU consumers:
 
--   Give user an access to new DB:
+        $ ps aux | sort -nrk 3,3 | head -n 5
 
-        # GRANT ALL ON test.* to 'username'@'hostname’;
+-   Get environment of running process:
 
--   Show all users:
+        $ tr '\0' '\n' < /proc/<pid>/environ
 
-        # SELECT User FROM mysql.user;
+-   Print specific line:
 
--   Show privileges of user:
+        $ sed -n -e 192997p access.log
 
-        # show grants for 'username'@'hostname';
+-   Add line numbers:
 
--   Get serverID (e.g. for replication):
+        $ cat access.log |awk '{ print NR,$(NF-1)}'|sort -k 2 > sorted.txt
 
-        # SELECT @@server_id
+-   Remove newlines:
 
--   Purge all binlogs before file:
+        $ tr '\n' ' ' < test.txt
 
-        # PURGE BINARY LOGS TO 'mysql-bin.010';
+-   See connection number status:
 
--   Purge all binlogs before midnight 3 days ago:
+        $ netstat -ant| awk '{print $6}' | sort | uniq -c | sort -n
+        $ netstat -ant| awk '{print $5}' |cut -d ':' -f1 | sort | uniq -c | sort -n
 
-        # PURGE BINARY LOGS BEFORE DATE(NOW() - INTERVAL 3 DAY) + INTERVAL 0 SECOND;
+### GDB magic
 
--   Set binlog expiration:
+-   Dump nginx config from running process:
 
-        # SET GLOBAL expire_logs_days = 3;
+        # Set pid of nginx master process here
+        pid=1234
+        # generate gdb commands from the process's memory mappings using awk
+        cat /proc/$pid/maps | awk '$6 !~ "^/" {split ($1,addrs,"-"); print "dump memory mem_" addrs[1] " 0x" addrs[1] " 0x" addrs[2] ;}END{print "quit"}' > gdb-commands
+        # use gdb with the -x option to dump these memory regions to mem_* files
+        gdb -p $pid -x gdb-commands
+        # look for some (any) nginx.conf text
+        grep worker_connections mem_*
+        grep server_name mem_*
 
-- Same in **my.cnf**:
 
-        [mysqld]
-        expire-logs-days=3
+-   Get stdout of running process:
 
--   Restore dump:
+        $ gdb -p <PID_OF_CAT_PROCESS> /bin/cat
+        (gdb) p close(1)
+        $1 = 0
+        (gdb) p creat("/tmp/foo3", 0600)
+        $2 = 1
+        (gdb) q
 
-        # mysql -u username -p < db_backup.dump
-
--   Dump schema:
-
-        # mysqldump -uusername -ppassword --no-data dbname > dbname_schema_dump.sql
-
--   Export table data to csv:
-
-        # (select 'fld_id','fld_username','fld_password','fld_firstname','fld_lastname','fld_gender','fld_month','fld_day','fld_year','fld_email','fld_country','fld_zipcode','fld_subscribe','updateon') union (select * from tbl_users into outfile '/tmp/users.csv' fields enclosed by '"' terminated by ',' escaped by '"' lines terminated by '\r\n');
-
-#### netstat
-
--   Get unique IPs connected to port 11211:
-
-        $ netstat -nap | grep 11211 | awk '{print $5}' | cut -d: -f1 | sort -u
-
-#### openssl
-TODO: add some openssl
-
-#### uncategorized
+### Misc
 
 -   Get inotify watches consumers:
 
@@ -103,4 +90,33 @@ TODO: add some openssl
         {
           echo $x
         }
+
+-   Ad-hoc network speed test:
+
+        # myserver.local.net
+        nc -v -v -l -n 2222 >/dev/null
+        # client
+        dd if=/dev/zero bs=1024K count=512 | nc -v -v -n myserver.local.net 2222 >/dev/null
+
+-   Simulate packet loss with **iptables**:
+
+        # for randomly dropping 10% of incoming packets:
+        iptables -A INPUT -m statistic --mode random --probability 0.1 -j DROP
+        # and for dropping 10% of outgoing packets:
+        iptables -A OUTPUT -m statistic --mode random --probability 0.1 -j DROP
+
+-   Get your local sshd host fingerprint:
+
+        $ ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub
+        $ ssh-keygen -E md5 -lf /etc/ssh/ssh_host_ed25519_key.pub
+
+-   Watch with pipe (memcached connections example):
+
+        $ watch -n 1 'lsof -i :11211|wc -l'
+
+-   Get a timestamp from dmesg for time **600711.395348**:
+
+        $ ut=`cut -d' ' -f1 </proc/uptime` 
+        $ ts=`date +%s` 
+        $ date -d "70-1-1 + $ts sec - $ut sec + 600711.395348 sec" +"%F %T"
 
