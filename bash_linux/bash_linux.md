@@ -1,0 +1,106 @@
+Bash&Linux
+==========
+
+Mostly linux-specific bash tricks.
+
+### Sections
+
+-   [AWK](#AWK-magic)
+
+-   [MySQL](#MySQL-queries-and-operations)
+
+-   [netstat](#netstat)
+
+-   [openssl](#openssl)
+
+-   [uncategorized](#uncategorized)
+
+### Content
+
+#### AWK magic
+
+-   Print field 3 if it starts from **some_string**:
+
+        $ awk '$3 ~ /^ *some_string/ {print $3}'
+
+#### MySQL queries and operations
+
+-   Create new user:
+
+        # create user 'username'@'hostname' identified with 'password’;
+
+-   Create new DB:
+
+        # create database test;
+
+-   Give user an access to new DB:
+
+        # GRANT ALL ON test.* to 'username'@'hostname’;
+
+-   Show all users:
+
+        # SELECT User FROM mysql.user;
+
+-   Show privileges of user:
+
+        # show grants for 'username'@'hostname';
+
+-   Get serverID (e.g. for replication):
+
+        # SELECT @@server_id
+
+-   Purge all binlogs before file:
+
+        # PURGE BINARY LOGS TO 'mysql-bin.010';
+
+-   Purge all binlogs before midnight 3 days ago:
+
+        # PURGE BINARY LOGS BEFORE DATE(NOW() - INTERVAL 3 DAY) + INTERVAL 0 SECOND;
+
+-   Set binlog expiration:
+
+        # SET GLOBAL expire_logs_days = 3;
+
+- Same in **my.cnf**:
+
+        [mysqld]
+        expire-logs-days=3
+
+-   Restore dump:
+
+        # mysql -u username -p < db_backup.dump
+
+-   Dump schema:
+
+        # mysqldump -uusername -ppassword --no-data dbname > dbname_schema_dump.sql
+
+-   Export table data to csv:
+
+        # (select 'fld_id','fld_username','fld_password','fld_firstname','fld_lastname','fld_gender','fld_month','fld_day','fld_year','fld_email','fld_country','fld_zipcode','fld_subscribe','updateon') union (select * from tbl_users into outfile '/tmp/users.csv' fields enclosed by '"' terminated by ',' escaped by '"' lines terminated by '\r\n');
+
+#### netstat
+
+-   Get unique IPs connected to port 11211:
+
+        $ netstat -nap | grep 11211 | awk '{print $5}' | cut -d: -f1 | sort -u
+
+#### openssl
+TODO: add some openssl
+
+#### uncategorized
+
+-   Get inotify watches consumers:
+
+        $ lsof -K | grep inotify | (less||more||pg)
+
+    hotfix:
+
+        $ echo 1048576 > /proc/sys/fs/inotify/max_user_watches
+
+-   Bash for-loop cpp-style
+
+        for ((x=; x<=; x++))
+        {
+          echo $x
+        }
+
