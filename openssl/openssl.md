@@ -53,6 +53,10 @@ Common things you may need to do with openssl cli utility.
 
         $ openssl s_client -connect some.mailserver.com:25 -starttls smtp 2>&1|grep notAfter
 
+-   Check cert on remote web server:
+
+        $ openssl s_client -connect some.webserver.com:443 2>/dev/null| openssl x509 -noout -text
+
 -   Generate a pseudo-random hex string:
 
         $ openssl rand -hex 16
