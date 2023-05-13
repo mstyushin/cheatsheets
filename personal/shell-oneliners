@@ -1,0 +1,66 @@
+---
+syntax: bash
+tags: [ shell ]
+---
+
+# Print field 3 if it starts from some_string:
+awk '$3 ~ /^ *some_string/ {print $3}'
+
+# Get unique IPs connected to local port 2222:
+netstat -nap | grep 2222 | awk '{print $5}' | cut -d: -f1 | sort -u
+
+# Get a value of the status key in a json:
+echo '{"jobId":"1","status":"RUNNING"}'|python3 -c 'import sys, json; print(json.load(sys.stdin)[sys.argv[1]])' status
+
+# Get top5 CPU consumers:
+ps aux | sort -nrk 3,3 | head -n 5
+
+# Get environment of running process:
+tr '\0' '\n' < /proc/<pid>/environ
+
+# Print specific line:
+sed -n -e 192997p access.log
+
+# Add line numbers:
+cat access.log |awk '{ print NR,$(NF-1)}'|sort -k 2 > sorted.txt
+
+# Remove newlines:
+tr '\n' ' ' < test.txt
+
+# See connection number status:
+netstat -ant| awk '{print $6}' | sort | uniq -c | sort -n
+netstat -ant| awk '{print $5}' |cut -d ':' -f1 | sort | uniq -c | sort -n
+
+# Get inotify watches consumers:
+lsof -K | grep inotify | (less||more||pg)
+
+# Bash for-loop cpp-style
+for ((x=; x<=; x++))
+{
+echo $x
+}
+
+# Ad-hoc network speed test:
+# myserver.local.net
+nc -v -v -l -n 2222 >/dev/null
+# client
+dd if=/dev/zero bs=1024K count=512 | nc -v -v -n myserver.local.net 2222 >/dev/null
+
+# Simulate packet loss with iptables:
+# for randomly dropping 10% of incoming packets:
+iptables -A INPUT -m statistic --mode random --probability 0.1 -j DROP
+# and for dropping 10% of outgoing packets:
+iptables -A OUTPUT -m statistic --mode random --probability 0.1 -j DROP
+
+# Get your local sshd host fingerprint:
+ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub
+ssh-keygen -E md5 -lf /etc/ssh/ssh_host_ed25519_key.pub
+
+# Watch with pipe (memcached connections example):
+watch -n 1 'lsof -i :11211|wc -l'
+
+# Get a timestamp from dmesg for time 600711.395348:
+ut=`cut -d' ' -f1 </proc/uptime` 
+ts=`date +%s` 
+date -d "70-1-1 + $ts sec - $ut sec + 600711.395348 sec" +"%F %T"
+
