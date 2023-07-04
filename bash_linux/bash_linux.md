@@ -50,6 +50,10 @@ Mostly linux-specific stuff.
         $ netstat -ant| awk '{print $6}' | sort | uniq -c | sort -n
         $ netstat -ant| awk '{print $5}' |cut -d ':' -f1 | sort | uniq -c | sort -n
 
+-   Get top 10 residential memory consumers with RSS column in Mb:
+
+        $ ps aux --sort +rss | tail -10|awk 'NR==1 {o=$0; a=match($0,$11);}; NR>1 {o=$0;$6=int(10*$5/1024)/10"M";}{ printf "%-8s %6s %-5s %-5s %9s %9s %-8s %-4s %-6s %-5s %s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, substr(o, a);}'
+
 ### GDB magic
 
 -   Dump nginx config from running process:

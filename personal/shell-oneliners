@@ -15,6 +15,9 @@ echo '{"jobId":"1","status":"RUNNING"}'|python3 -c 'import sys, json; print(json
 # Get top5 CPU consumers:
 ps aux | sort -nrk 3,3 | head -n 5
 
+# Get top10 residential memory consumers with RSS column in Mb:
+ps aux --sort +rss | tail -10|awk 'NR==1 {o=$0; a=match($0,$11);}; NR>1 {o=$0;$6=int(10*$5/1024)/10"M";}{ printf "%-8s %6s %-5s %-5s %9s %9s %-8s %-4s %-6s %-5s %s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, substr(o, a);}'
+
 # Get environment of running process:
 tr '\0' '\n' < /proc/<pid>/environ
 
