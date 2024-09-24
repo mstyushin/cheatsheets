@@ -114,6 +114,10 @@ Mostly linux-specific stuff.
         $ ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub
         $ ssh-keygen -E md5 -lf /etc/ssh/ssh_host_ed25519_key.pub
 
+-   Get your ssh pubkey fingerprint:
+
+        $ ssh-keygen -l -E sha256 -f ~/.ssh/id_rsa.pub
+
 -   Watch with pipe (memcached connections example):
 
         $ watch -n 1 'lsof -i :11211|wc -l'
