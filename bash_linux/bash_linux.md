@@ -102,6 +102,12 @@ Mostly linux-specific stuff.
         # client
         dd if=/dev/zero bs=1024K count=512 | nc -v -v -n myserver.local.net 2222 >/dev/null
 
+-   Send a file over netcat 
+        # server
+        nc -l -p 1234 -q 1 > something.zip < /dev/null
+        # client
+        cat something.zip | netcat server.ip.here 1234
+
 -   Simulate packet loss with **iptables**:
 
         # for randomly dropping 10% of incoming packets:
